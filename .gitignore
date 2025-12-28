@@ -3,3 +3,4 @@ __pycache__/
 airtable_etl.ipynb
 .gitignore
 dev
+.env
