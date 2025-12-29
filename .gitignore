@@ -4,3 +4,4 @@ airtable_etl.ipynb
 .gitignore
 dev
 .env
+venv

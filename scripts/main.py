@@ -1,43 +1,104 @@
-# Use a pipeline as a high-level helper
-from transformers import pipeline
-import re
+import argostranslate.package
+import argostranslate.translate
+import json
+from pathlib import Path
 
-pipe = pipeline("translation", model="Helsinki-NLP/opus-mt-en-es", max_length=400)
+from_code = "en"
+to_code = "es"
 
-def translate_long_text(text, max_chunk_size=200):
-    """
-    Split long text into chunks and translate each chunk separately.
-    """
-    # Split text into sentences
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    
-    chunks = []
-    current_chunk = []
-    current_length = 0
-    
-    # Simple token estimation: ~4 characters per token
-    for sentence in sentences:
-        sentence_length = len(sentence) // 4
-        if current_length + sentence_length > max_chunk_size and current_chunk:
-            chunks.append(' '.join(current_chunk))
-            current_chunk = [sentence]
-            current_length = sentence_length
-        else:
-            current_chunk.append(sentence)
-            current_length += sentence_length
-    
-    if current_chunk:
-        chunks.append(' '.join(current_chunk))
-    
-    # Translate each chunk
-    translated_chunks = []
-    for chunk in chunks:
-        result = pipe(chunk, max_length=400)
-        translated_chunks.append(result[0]['translation_text'])
-    
-    return ' '.join(translated_chunks)
+# Download and install Argos Translate package
+argostranslate.package.update_package_index()
+available_packages = argostranslate.package.get_available_packages()
+package_to_install = next(
+    filter(
+        lambda x: x.from_code == from_code and x.to_code == to_code, available_packages
+    )
+)
+argostranslate.package.install_from_path(package_to_install.download())
 
-text = " the eldest son of Amram and Jochebed, a daughter of Levi (  Exodus 6:20  ). Some explain the name as meaning mountaineer, others mountain of strength, illuminator. He was born in Egypt three years before his brother Moses, and a number of years after his sister Miriam (  Exodus 2:1   Exodus 2:4  ;   7:7  ). He married Elisheba, the daughter of Amminadab of the house of Judah (  6:23  ;   1\ufffdChronicles 2:10  ), by whom he had four sons, Nadab and Abihu, Eleazar and Ithamar. When the time for the deliverance of Isarael out of Egypt drew nigh, he was sent by God (  Exodus 4:14   Exodus 4:27-30  ) to meet his long-absent brother, that he might co-operate with him in all that they were required to do in bringing about the Exodus. He was to be the \"mouth\" or \"prophet\" of Moses, i.e., was to speak for him, because he was a man of a ready utterance (  Exodus 7:1   Exodus 7:2   Exodus 7:9   Exodus 7:10   Exodus 7:19  ). He was faithful to his trust, and stood by Moses in all his interviews with Pharaoh.    When the ransomed tribes fought their first battle with Amalek in Rephidim, Moses stood on a hill overlooking the scene of the conflict with the rod of God in his outstretched hand. On this occasion he was attended by Aaron and Hur, his sister's husband, who held up his wearied hands till Joshua and the chosen warriors of Israel gained the victory (  17:8-13  ).    Afterwards, when encamped before Sinai, and when Moses at the command of God ascended the mount to receive the tables of the law, Aaron and his two sons, Nadab and Abihu, along with seventy of the elders of Israel, were permitted to accompany him part of the way, and to behold afar off the manifestation of the glory of Israel's God (  Exodus 19:24  ;   24:9-11  ). While Moses remained on the mountain with God, Aaron returned unto the people; and yielding through fear, or ignorance, or instability of character, to their clamour, made unto them a golden calf, and set it up as an object of worship (  Exodus 32:4  ;   Psalms 106:19  ). On the return of Moses to the camp, Aaron was sternly rebuked by him for the part he had acted in this matter; but he interceded for him before God, who forgave his sin (  Deuteronomy 9:20  ).    On the mount, Moses received instructions regarding the system of worship which was to be set up among the people; and in accordance therewith Aaron and his sons were consecrated to the priest's office (  Leviticus 8  ;   9  ). Aaron, as high priest, held henceforth the prominent place appertaining to that office.    When Israel had reached Hazeroth, in \"the wilderness of Paran,\" Aaron joined with his sister Miriam in murmuring against Moses, \"because of the Ethiopian woman whom he had married,\" probably after the death of Zipporah. But the Lord vindicated his servant Moses, and punished Miriam with leprosy (  Numbers 12  ). Aaron acknowledged his own and his sister's guilt, and at the intercession of Moses they were forgiven.    Twenty years after this, when the children of Israel were encamped in the wilderness of Paran, Korah, Dathan, and Abiram conspired against Aaron and his sons; but a fearful judgment from God fell upon them, and they were destroyed, and the next day thousands of the people also perished by a fierce pestilence, the ravages of which were only stayed by the interposition of Aaron (  Numbers 16  ). That there might be further evidence of the divine appointment of Aaron to the priestly office, the chiefs of the tribes were each required to bring to Moses a rod bearing on it the name of his tribe. And these, along with the rod of Aaron for the tribe of Levi, were laid up overnight in the tabernacle, and in the morning it was found that while the other rods remained unchanged, that of Aaron \"for the house of Levi\" budded, blossomed, and yielded almonds (  Numbers 17:1-10  ). This rod was afterwards preserved in the tabernacle (  Hebrews 9:4  ) as a memorial of the divine attestation of his appointment to the priesthood.    Aaron was implicated in the sin of his brother at Meribah (  Numbers 20:8-13  ), and on that account was not permitted to enter the Promised Land. When the tribes arrived at Mount Hor, \"in the edge of the land of Edom,\" at the command of God Moses led Aaron and his son Eleazar to the top of that mountain, in the sight of all the people. There he stripped Aaron of his priestly vestments, and put them upon Eleazar; and there Aaron died on the top of the mount, being 123 years old (  Numbers 20:23-29  . Compare   Deuteronomy 10:6  ;   32:50  ), and was \"gathered unto his people.\" The people, \"even all the house of Israel,\" mourned for him thirty days. Of Aaron's sons two survived him, Eleazar, whose family held the high-priesthood till the time of Eli; and Ithamar, in whose family, beginning with Eli, the high-priesthood was held till the time of Solomon. Aaron's other two sons had been struck dead (  Leviticus 10:1   Leviticus 10:2  ) for the daring impiety of offering \"strange fire\" on the alter of incense.    The Arabs still show with veneration the traditionary site of Aaron's grave on one of the two summits of Mount Hor, which is marked by a Mohammedan chapel. His name is mentioned in the Koran, and there are found in the writings of the rabbins many fabulous stories regarding him.   He was the first anointed priest. His descendants, \"the house of Aaron,\" constituted the priesthood in general. In the time of David they were very numerous (  1\ufffdChronicles 12:27  ). The other branches of the tribe of Levi held subordinate positions in connection with the sacred office. Aaron was a type of Christ in his official character as the high priest. His priesthood was a \"shadow of heavenly things,\" and was intended to lead the people of Israel to look forward to the time when \"another priest\" would arise \"after the order of Melchizedek\" (  Hebrews 6:20  ). (See  MOSES )"
+def translate(text: str) -> str:
+    return argostranslate.translate.translate(text, from_code, to_code)
 
-result = translate_long_text(text)
-print(result)
+# Get the script directory and project root
+script_dir = Path(__file__).parent
+project_root = script_dir.parent
+json_dir = project_root / "json"
+people_output_dir = script_dir / "people"
+people_output_dir.mkdir(exist_ok=True)
+
+# Read people.json
+people_json_path = json_dir / "people.json"
+with open(people_json_path, "r", encoding="utf8") as f:
+    people = json.load(f)
+
+processed_people = []
+
+# Type validation
+for person in people:
+    assert isinstance(person["fields"]["name"], str), person["fields"]["name"]
+    
+    if "dictText" in person["fields"] and person["fields"]["dictText"] is not None:
+        assert isinstance(person["fields"]["dictText"], list), person["fields"]["name"]
+    
+    if "alsoCalled" in person["fields"] and person["fields"]["alsoCalled"] is not None:
+        assert isinstance(person["fields"]["alsoCalled"], str), person["fields"]["name"]
+    
+    if "Disambiguation (temp)" in person["fields"] and person["fields"]["Disambiguation (temp)"] is not None:
+        assert isinstance(person["fields"]["Disambiguation (temp)"], str), person["fields"]["name"]
+    
+    if "surname" in person["fields"] and person["fields"]["surname"] is not None:
+        assert isinstance(person["fields"]["surname"], str), person["fields"]["name"]
+    
+    if "events" in person["fields"] and person["fields"]["events"] is not None:
+        assert isinstance(person["fields"]["events"], str), person["fields"]["name"]
+
+# Process each person
+for i, person in enumerate(people):
+    print(f"Processing person {i} {person['fields']['name']} of {len(people)}")
+    
+    # Translate name
+    translated_name = translate(person["fields"]["name"])
+    
+    # Translate dictText array if present
+    translated_dict_text = None
+    if "dictText" in person["fields"] and person["fields"]["dictText"] and len(person["fields"]["dictText"]) > 0:
+        translated_dict_text = [translate(text) for text in person["fields"]["dictText"]]
+    
+    # Translate optional fields
+    translated_also_called = None
+    if "alsoCalled" in person["fields"] and person["fields"]["alsoCalled"]:
+        translated_also_called = translate(person["fields"]["alsoCalled"])
+    
+    translated_disambiguation = None
+    if "Disambiguation (temp)" in person["fields"] and person["fields"]["Disambiguation (temp)"]:
+        translated_disambiguation = translate(person["fields"]["Disambiguation (temp)"])
+    
+    translated_surname = None
+    if "surname" in person["fields"] and person["fields"]["surname"]:
+        translated_surname = translate(person["fields"]["surname"])
+    
+    translated_events = None
+    if "events" in person["fields"] and person["fields"]["events"]:
+        translated_events = translate(person["fields"]["events"])
+    
+    # Update person fields with translated values
+    person["fields"]["name"] = translated_name
+    if "dictText" in person["fields"]:
+        person["fields"]["dictText"] = translated_dict_text
+    if "alsoCalled" in person["fields"]:
+        person["fields"]["alsoCalled"] = translated_also_called
+    if "Disambiguation (temp)" in person["fields"]:
+        person["fields"]["Disambiguation (temp)"] = translated_disambiguation
+    if "surname" in person["fields"]:
+        person["fields"]["surname"] = translated_surname
+    if "events" in person["fields"]:
+        person["fields"]["events"] = translated_events
+    
+    processed_people.append(person)
+    
+    # Save incrementally
+    output_path = people_output_dir / "people-processed.json"
+    with open(output_path, "w", encoding="utf8") as f:
+        json.dump(processed_people, f, ensure_ascii=False, indent=2)
+
+print(f"Processed {len(people)} people")

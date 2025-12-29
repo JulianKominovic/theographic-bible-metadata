@@ -124,18 +124,3 @@ for (let i = 0; i < people.length; i++) {
 }
 
 console.log(people);
-
-// console.log(keysToTranslate.length)
-
-// const slicedKeys = slice(keysToTranslate,100);
-
-// console.log(JSON.stringify(slicedKeys[0]))
-// const translatedKeys = await Promise.all(keysToTranslate.slice(0,100).map(async (key: KeyToTranslate) => {
-//     const translated = await translate();
-//     return {
-//         ...key,
-//         translated
-//     }
-// }));
-// console.log(translatedKeys)
-// writeFileSync(join(__dirname,"people-keys-to-translate.json"),JSON.stringify(keysToTranslate),"utf8");
